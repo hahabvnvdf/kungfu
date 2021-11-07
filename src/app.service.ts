@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import fetch from 'cross-fetch';
+import { Cron } from '@nestjs/schedule';
+import * as fs from 'fs';
+import { type } from 'os';
 
 @Injectable()
 export class AppService {
@@ -8,6 +11,14 @@ export class AppService {
   }
 
   async generateToken() {
+    const file = fs.readFileSync('./src/token.txt', 'utf-8');
+    // console.log(file);
+    return file;
+  }
+
+  @Cron(new Date(Date.now() + 4 * 360 * 1000))
+  // @Cron('1 * * * * *')
+  async runEveryMinute() {
     try {
       const res = await fetch(
         'https://api.kungfustockspro.live:8443/api/login',
@@ -27,7 +38,9 @@ export class AppService {
         throw new Error('Bad response from server');
       }
       const user = await res.json();
-      return user.access_token;
+      fs.writeFileSync('./src/token.txt', user.access_token, 'utf-8');
+
+      console.log('new token');
     } catch (err) {
       console.error(err);
     }
