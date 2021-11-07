@@ -16,9 +16,7 @@ export class AppService {
     return file;
   }
 
-  @Cron(new Date(Date.now() + 4 * 360 * 1000))
-  // @Cron('1 * * * * *')
-  async runEveryMinute() {
+  async manualGenerateToken() {
     try {
       const res = await fetch(
         'https://api.kungfustockspro.live:8443/api/login',
@@ -44,5 +42,11 @@ export class AppService {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  @Cron(new Date(Date.now() + 4 * 360 * 1000))
+  // @Cron('1 * * * * *')
+  async runEveryMinute() {
+    await this.manualGenerateToken();
   }
 }

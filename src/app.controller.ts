@@ -9,4 +9,9 @@ export class AppController {
   async generateToken() {
     return await this.appService.generateToken();
   }
+
+  @Get('/reset')
+  async manualGenerateToken() {
+    return await this.appService.manualGenerateToken();
+  }
 }
