@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import fetch from 'cross-fetch';
 import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs';
-import { type } from 'os';
 
 @Injectable()
 export class AppService {
@@ -25,7 +24,7 @@ export class AppService {
           body: JSON.stringify({
             email: 'haminh1998@gmail.com',
             password: 'Minh@1998',
-            persist_login: false,
+            persist_login: true,
           }),
           headers: {
             'Content-Type': 'application/json',
@@ -42,11 +41,5 @@ export class AppService {
     } catch (err) {
       console.error(err);
     }
-  }
-
-  @Cron(new Date(Date.now() + 4 * 360 * 1000))
-  // @Cron('1 * * * * *')
-  async runEveryMinute() {
-    await this.manualGenerateToken();
   }
 }
