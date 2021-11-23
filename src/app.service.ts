@@ -1,10 +1,10 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import fetch from 'cross-fetch';
-import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs';
-
+import * as https from 'https';
 @Injectable()
 export class AppService {
+  constructor(private httpService: HttpService) {}
   getHello(): string {
     return 'Hello World!';
   }
@@ -17,27 +17,43 @@ export class AppService {
 
   async manualGenerateToken() {
     try {
-      const res = await fetch(
-        'https://api.kungfustockspro.live:8443/api/login',
-        {
-          method: 'POST',
-          body: JSON.stringify({
+      // const res = await this.httpService.post(
+      //   'https://api.kungfustockspro.live:8443/api/login',
+      //   JSON.stringify({
+      //     email: 'haminh1998@gmail.com',
+      //     password: 'Minh@1998',
+      //     persist_login: true,
+      //   }),
+      //   {
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //   },
+      // );
+      // if (res. >= 400) {
+      //   throw new Error('Bad response from server');
+      //
+      const httpsAgent = new https.Agent({
+        rejectUnauthorized: false,
+      });
+
+      const res = await this.httpService
+        .post(
+          'https://api.kungfustockspro.live:8443/api/login',
+          JSON.stringify({
             email: 'haminh1998@gmail.com',
             password: 'Minh@1998',
             persist_login: true,
           }),
-          headers: {
-            'Content-Type': 'application/json',
+          {
+            httpsAgent: httpsAgent,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        },
-      );
-      if (res.status >= 400) {
-        throw new Error('Bad response from server');
-      }
-      const user = await res.json();
-      fs.writeFileSync('./src/token.txt', user.access_token, 'utf-8');
-
-      console.log('new token');
+        )
+        .toPromise();
+      fs.writeFileSync('./src/token.txt', res.data.access_token, 'utf-8');
     } catch (err) {
       console.error(err);
     }
